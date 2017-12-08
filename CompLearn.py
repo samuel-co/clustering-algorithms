@@ -1,16 +1,37 @@
+'''
+Sam Congdon, Kendall Dilorenzo, Michel Hewitt
+CSCI 447: MachineLearning
+Project 4: CompLearn
+December 11, 2017
+
+This python module is used to create a series of clusters using a Competitive Learning algorithm.
+The module utilizes the normalized data version of the algorithm. Input data is automatically normalized.
+complear_clustering() is the primary function, others are helper functions. Parameters are the data points,
+number of output nodes on the network, the maximum training iterations, and learning rate. Returns a list
+of clusters, each cluster represented as a list of the points contained.
+'''
 
 import numpy as np
 import random
 
-def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.1):
+def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
+    ''' Create a list of clusters utilizing the Competitive Learning algorithm. This algorithm normalizes
+        the data to run. Parameters are the data to be clustered, number of output nodes, max training
+        iterations, and the learning rate. The network is randomly intialized, then trained on a randomly
+        selected point. Only the winning node's weights are updated after each training iteration. The
+        network is trained until a stable state is reached, or the max number of iterations have been run.
+        Once trained, the points are classified by which output node wins, and these clusters are then
+        returned.'''
 
+    # create the initial weight matrix
     weights = [np.random.uniform(0.0, 1, len(data[0])) for _ in range(num_outputs)]
 
+    # normalize the data
     mini, maxi = get_min_max_values(data)
     data = normalize_data(data, mini, maxi)
 
     # train the network. If no change is made for stagnant iterations, training is terminated. Otherwise completes iterations
-    stagnant = 5
+    stagnant = 100
     for i in range(iterations):
         # randomly select a point to test
         input = random.sample(data, 1)[0]
@@ -26,11 +47,13 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.1):
         # if no change was made, increment stagnant and check if training should terminate
         if np.all(new_weights == weights[winner]):
             stagnant -= 1
-            if stagnant <= 0: break
+            if stagnant <= 0:
+                print("CompLearn terminated after {} iterations as stagnation was achieved".format(i))
+                break
         # else update the weights, reset stagnant counter
         else:
             weights[winner] = new_weights
-            stagnant = 5
+            stagnant = 100
 
     clusters = [[] for _ in range(num_outputs)]
 
@@ -49,7 +72,8 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.1):
     return new_clusters
 
 def compete(weights, input):
-    ''' Determine which output nodes weights have the best match the input based on Euclidean distance.
+    ''' Determine which output nodes weights have the best match the input by selecting the output node with
+        the largest activation, determined by summing the (input * weight) array of each node.
         Return the id of the winning node. This method assumes the data is normalized'''
 
     winner_id = -1
@@ -71,7 +95,6 @@ def update_weights(weights, input, winner, learning_rate):
         data is normalized. new_weight = weight + learning_rate * feature for each weight. '''
 
     return [weight + learning_rate * (feature) for weight, feature in zip(weights[winner], input)]
-
 
 def get_min_max_values(data):
     ''' Create arrays of the maximum and minimum values for each feature of the points over the entire dataset'''

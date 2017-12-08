@@ -1,9 +1,10 @@
 
 import os
 import math
-import statistics
+import KMeans
 import DBScan
 import CompLearn
+import time
 
 def import_data(file_name):
     ''' Imports data points from supplied file, formatting them into data point lists to be clustered. '''
@@ -73,38 +74,43 @@ def SSE(clusters):
 
     return total_sum
 
-def get_min_max_values(data):
-    ''' Create arrays of the maximum and minimum values for each feature of the points over the entire dataset'''
-    mini = [min([point[i] for point in data]) for i in range(len(data[0]))]
-    maxi = [max([point[i] for point in data]) for i in range(len(data[0]))]
-    return mini, maxi
-
-def normalize_data(data, mini, maxi):
-    ''' Normalize the data to be between 0 and 1, returns the input points with their normalized
-        value in the same shape. '''
-    return [[(point[i] - mini[i]) / (maxi[i] - mini[i]) if mini[i] != maxi[i] else 0.5 for i in range(len(point))] for point in data]
-
 
 def main():
     data, name = import_data('datasets/iris.txt')
 
-    clusters = CompLearn.complearn_clustering(data, 5, 1000000)
-
-    print("Using CompLearn to cluster dataset {}:".format(name))
-    print("- Number of clusters = {}".format(len(clusters)))
-    print("- Intra-distance = {}".format(intra_distance(clusters)))
-    print("- Inter-distance = {}".format(inter_distance(clusters)))
-    print("- SSE = {}".format(SSE(clusters)))
-
-    clusters = DBScan.db_clustering(data, 30, 2.6)
-    mini, maxi = get_min_max_values(data)
-    normal_clusters = [normalize_data(cluster, mini, maxi) for cluster in clusters]
-
-    print("Using DBScan to cluster dataset {}:".format(name))
+    print("Using K-Means to cluster dataset {}:".format(name))
+    start = time.time()
+    clusters = KMeans.kmeans_clustering(data, 3, 10000)
+    end = time.time()
+    mini, maxi = CompLearn.get_min_max_values(data)
+    normal_clusters = [CompLearn.normalize_data(cluster, mini, maxi) for cluster in clusters]
     print("- Number of clusters = {}".format(len(clusters)))
     print("- Intra-distance = {}".format(intra_distance(normal_clusters)))
     print("- Inter-distance = {}".format(inter_distance(normal_clusters)))
     print("- SSE = {}".format(SSE(normal_clusters)))
+    print("- Time elapsed = {}\n".format(end - start))
+
+    print("Using DBScan to cluster dataset {}:".format(name))
+    start = time.time()
+    clusters = DBScan.db_clustering(data, 30, 2.6)
+    end = time.time()
+    mini, maxi = CompLearn.get_min_max_values(data)
+    normal_clusters = [CompLearn.normalize_data(cluster, mini, maxi) for cluster in clusters]
+    print("- Number of clusters = {}".format(len(clusters)))
+    print("- Intra-distance = {}".format(intra_distance(normal_clusters)))
+    print("- Inter-distance = {}".format(inter_distance(normal_clusters)))
+    print("- SSE = {}".format(SSE(normal_clusters)))
+    print("- Time elapsed = {}\n".format(end - start))
+
+    print("Using CompLearn to cluster dataset {}:".format(name))
+    start = time.time()
+    normal_clusters = CompLearn.complearn_clustering(data, 6, 100000)
+    end = time.time()
+    print("- Number of clusters = {}".format(len(normal_clusters)))
+    print("- Intra-distance = {}".format(intra_distance(normal_clusters)))
+    print("- Inter-distance = {}".format(inter_distance(normal_clusters)))
+    print("- SSE = {}".format(SSE(normal_clusters)))
+    print("- Time elapsed = {}\n".format(end-start))
 
 
 if __name__ == '__main__':

@@ -18,7 +18,11 @@ import math
 def db_clustering(data, num_points, radius=None):
     ''' Create a list of clusters through the DBScan algorithm. Parameters are the data points to be clustered,
         the minimum number of neighboring points required to create a core point, and the radius to search for
-        these neighbors. '''
+        these neighbors. The algorithm iterates over each data point, checking if it can be a core point. If so,
+        the point is passed to the expand cluster function. This function will grow the cluster by analyzing each
+        neighboring point to determine if it's of adequate density to be in the cluster. If so, this point is added,
+        then all of its neighbors are evaluated for the same criteria. This is performed until no more neighbors
+        are left to evaluate. Returns a list of clusters, each cluster represented as a list of the points contained. '''
 
     clusters = []
 
@@ -49,15 +53,15 @@ def db_clustering(data, num_points, radius=None):
             # otherwise label the point as noise
             else: point[-1] = 'N'
 
-    print('DATA = {}'.format(data))
+    #print('DATA = {}'.format(data))
 
     # delete the point labels added to perform DBScan
     for i in range(len(clusters)):
         for j in range(len(clusters[i])):
             del clusters[i][j][-1]
 
-    print('Number of clusters created = {}'.format(len(clusters)))
-    print('CLUSTERS = {}'.format(clusters))
+    #print('Number of clusters created = {}'.format(len(clusters)))
+    #print('CLUSTERS = {}'.format(clusters))
 
     return clusters
 
