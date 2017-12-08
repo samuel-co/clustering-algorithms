@@ -5,6 +5,9 @@ import KMeans
 import DBScan
 import CompLearn
 import time
+import copy
+import random as rand
+import matplotlib.pyplot as plt
 
 def import_data(file_name):
     ''' Imports data points from supplied file, formatting them into data point lists to be clustered. '''
@@ -70,47 +73,85 @@ def SSE(clusters):
 
     return total_sum
 
-def test_clustering(clusters, time, normal = False):
+def test_clustering(clusters, time, normal = False, output=True):
     ''' Print the evaluation metrics for a series of metrics. If normal = False, input clusters
         will be normalize before being evaluated. '''
 
     if not normal:
         extremes = [CompLearn.get_min_max_values(cluster) for cluster in clusters]
-        mini, temp = CompLearn.get_min_max_values([pair[0] for pair in extremes])
-        temp, maxi = CompLearn.get_min_max_values([pair[1] for pair in extremes])
+        mini, maxi = CompLearn.get_min_max_values([pair[0] for pair in extremes] + [pair[1] for pair in extremes])
         clusters = [CompLearn.normalize_data(cluster, mini, maxi) for cluster in clusters]
 
-    print("- Number of clusters = {}".format(len(clusters)))
-    print("- Intra-distance = {}".format(intra_distance(clusters)))
-    print("- Inter-distance = {}".format(inter_distance(clusters)))
-    print("- SSE = {}".format(SSE(clusters)))
-    print("- Time elapsed = {}\n".format(time))
+    # calculate the evaluation metrics
+    eval = [intra_distance(clusters), inter_distance(clusters), SSE(clusters)]
 
+    # If the method is expected to output the info, do so
+    if output:
+        print("- Number of clusters = {}".format(len(clusters)))
+        print("- Intra-distance = {}".format(eval[0]))
+        print("- Inter-distance = {}".format(eval[1]))
+        print("- SSE = {}".format(eval[2]))
+        print("- Time elapsed = {}\n".format(time))
+
+    return eval
+
+def show_2d_clusters(data, clusters, normal=False):
+
+    if not normal:
+        mini, maxi = CompLearn.get_min_max_values(data)
+        clusters = [CompLearn.normalize_data(cluster, mini, maxi) for cluster in clusters]
+
+    colors = ['c', 'y', 'm', 'k']
+    color = 0
+    for cluster in clusters:
+        plt.scatter([point[0] for point in cluster], [point[1] for point in cluster], c=colors[color % 4])
+        color += 1
+    plt.show()
 
 def main():
+
+    mockData = []
+    for i in range(1000):
+        point = []
+        for j in range(2):
+            val = rand.uniform(0, .4)
+            point.append(val)
+        mockData.append(point)
+        point = []
+        for j in range(2):
+            val = rand.uniform(.6, 1)
+            point.append(val)
+        mockData.append(point)
+
+        point = []
+        point.append(rand.uniform(0, .3))
+        point.append(rand.uniform(0.7, 1))
+        mockData.append(point)
+
     data, name = import_data('datasets/iris.txt')
+    data = mockData
 
     print("Using K-Means to cluster dataset {}:".format(name))
     start = time.time()
-    clusters = KMeans.kmeans_clustering(data, 3, 10000)
+    clusters = KMeans.kmeans_clustering(copy.deepcopy(data), 3, 10000)
     end = time.time()
     test_clustering(clusters, end-start)
 
 
     print("Using DBScan to cluster dataset {}:".format(name))
     start = time.time()
-    clusters = DBScan.db_clustering(data, 30, 2.6)
-    end = time.time()
+    clusters = DBScan.db_clustering(copy.deepcopy(data), 30, 0.5)
     end = time.time()
     test_clustering(clusters, end - start)
 
 
     print("Using CompLearn to cluster dataset {}:".format(name))
     start = time.time()
-    clusters = CompLearn.complearn_clustering(data, 6, 100000)
+    clusters = CompLearn.complearn_clustering(copy.deepcopy(data), 6, 100000)
     end = time.time()
-    end = time.time()
-    test_clustering(clusters, end - start, True)
+    test_clustering(clusters, end - start, normal=True)
+
+    show_2d_clusters(data, clusters, normal=True)
 
 
 if __name__ == '__main__':
