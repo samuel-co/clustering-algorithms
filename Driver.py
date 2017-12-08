@@ -1,5 +1,7 @@
 
 import os
+import random
+import DBScan
 
 def import_data(file_name):
     ''' Imports data points from supplied file, formatting them into data point lists to be clustered. '''
@@ -19,7 +21,11 @@ def import_data(file_name):
 
 
 def main():
-    data_iris = import_data('datasets/iris.txt')
+    data, name = import_data('datasets/iris.txt')
+
+    clusters = DBScan.db_clustering(data, 30)
+
+
 
 if __name__ == '__main__':
     main()
