@@ -1,4 +1,14 @@
+'''
+Sam Congdon, Kendall Dilorenzo, Michel Hewitt
+CSCI 447: MachineLearning
+Project 4: KMeans
+December 11, 2017
 
+This python module is used to create a series of clusters using a k-means clustering. kmeans_clustering()
+is the primary function, find_clusters and move_centroids are helper functions. Parameters are the data to
+be clustered, the number of clusters to be created, and the maximum number of iterations to perform before
+termination. Returns a list of clusters, each cluster represented as a list of the points contained.
+'''
 
 
 import numpy as np
