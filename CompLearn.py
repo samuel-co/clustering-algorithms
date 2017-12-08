@@ -25,13 +25,14 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
 
     # create the initial weight matrix
     weights = [np.random.uniform(0.0, 1, len(data[0])) for _ in range(num_outputs)]
+    weights = [[weight[i] / sum(weight) for i in range(len(weight))] for weight in weights ]
 
     # normalize the data
     mini, maxi = get_min_max_values(data)
     data = normalize_data(data, mini, maxi)
 
     # train the network. If no change is made for stagnant iterations, training is terminated. Otherwise completes iterations
-    stagnant = 100
+    stagnant = 5
     for i in range(iterations):
         # randomly select a point to test
         input = random.sample(data, 1)[0]
@@ -41,11 +42,13 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
         new_weights = update_weights(weights, input, winner, learning_rate)
 
         # normalize the new weights
-        mini, maxi = get_min_max_values(weights[:winner] + [new_weights] + weights[winner+1:])
-        new_weights = normalize_data([new_weights], mini, maxi)[0]
+        new_weights = [new_weights[i] / sum(new_weights) for i in range(len(new_weights))]
+
+        # create a difference list to track whether the weights were updated at a value greater than 0.0001
+        dif = [True if round(new_weights[i], 4) == round(weights[winner][i], 4) else False for i in range(len(weights[winner]))]
 
         # if no change was made, increment stagnant and check if training should terminate
-        if np.all(new_weights == weights[winner]):
+        if np.all(dif):
             stagnant -= 1
             if stagnant <= 0:
                 print("CompLearn terminated after {} iterations as stagnation was achieved".format(i))
@@ -53,7 +56,7 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
         # else update the weights, reset stagnant counter
         else:
             weights[winner] = new_weights
-            stagnant = 100
+            stagnant = 5
 
     clusters = [[] for _ in range(num_outputs)]
 
@@ -77,13 +80,13 @@ def compete(weights, input):
         Return the id of the winning node. This method assumes the data is normalized'''
 
     winner_id = -1
-    winner_value = 99999
+    winner_value = 0
     # for each output node
     for i in range(len(weights)):
         # calculate its similarity to the input vector
         current_fitness = sum([a*b for a, b in zip(input, weights[i])])
-        # if the current node is more similar, update the current winner values
-        if winner_value > current_fitness:
+        # if the current node has a higher output, update the winner info
+        if winner_value < current_fitness:
             winner_id = i
             winner_value = current_fitness
 
