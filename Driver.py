@@ -88,17 +88,13 @@ def normalize_data(data, mini, maxi):
 def main():
     data, name = import_data('datasets/iris.txt')
 
-    mini, maxi = get_min_max_values(data)
-    data = normalize_data(data, mini, maxi)
-    clusters = CompLearn.complearn_clustering(data, 3, 1000)
+    clusters = CompLearn.complearn_clustering(data, 5, 1000000)
 
     print("Using CompLearn to cluster dataset {}:".format(name))
     print("- Number of clusters = {}".format(len(clusters)))
     print("- Intra-distance = {}".format(intra_distance(clusters)))
     print("- Inter-distance = {}".format(inter_distance(clusters)))
     print("- SSE = {}".format(SSE(clusters)))
-
-
 
     clusters = DBScan.db_clustering(data, 30, 2.6)
     mini, maxi = get_min_max_values(data)
