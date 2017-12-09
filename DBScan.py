@@ -53,17 +53,16 @@ def db_clustering(data, num_points, radius=None):
             # otherwise label the point as noise
             else: point[-1] = 'N'
 
-    #print('DATA = {}'.format(data))
-
     # delete the point labels added to perform DBScan
     for i in range(len(clusters)):
         for j in range(len(clusters[i])):
             del clusters[i][j][-1]
 
-    #print('Number of clusters created = {}'.format(len(clusters)))
-    #print('CLUSTERS = {}'.format(clusters))
+    new_clusters = []
+    for cluster in clusters:
+        if cluster: new_clusters.append(cluster)
 
-    return clusters
+    return new_clusters
 
 def find_border(data, point, radius):
     ''' Find and return all points within the radius of our passed in point '''
@@ -80,20 +79,21 @@ def expand_cluster(data, core_point, neighbors, radius, num_points):
     ''' Creates a cluster based on a core point. The initial list of neighbors is passed in to avoid
         duplicate operations being performed '''
     cluster = [core_point]
-
     # as long as point remain to be checked
     while neighbors:
         point = neighbors.pop(0)
         # if this point has not yet been visited
-        if point[-1] is None:
+        #if point[-1] is None or point[-1] == 'N':
+        if point not in cluster:
             # check if the point has an adequate number of neighbors to act as a core point.
             candidates = find_border(data, point, radius)
             if len(candidates) >= num_points:
                 # if enough candidates are neighboring this neighbor, add them to our list of neighbors
-                neighbors.append(candidates)
+                #neighbors.append(candidates)
+                neighbors += candidates
             # label the current point and add it to the cluster
             point[-1] = 'B'
             cluster.append(point)
-
+    if len(cluster) < num_points: return []
     return cluster
 
