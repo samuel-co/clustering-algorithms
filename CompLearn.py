@@ -14,7 +14,7 @@ of clusters, each cluster represented as a list of the points contained.
 import numpy as np
 import random
 
-def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
+def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.01):
     ''' Create a list of clusters utilizing the Competitive Learning algorithm. This algorithm normalizes
         the data to run. Parameters are the data to be clustered, number of output nodes, max training
         iterations, and the learning rate. The network is randomly intialized, then trained on a randomly
@@ -32,7 +32,7 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
     data = normalize_data(data, mini, maxi)
 
     # train the network. If no change is made for stagnant iterations, training is terminated. Otherwise completes iterations
-    stagnant = 5
+    stagnant = 50
     for i in range(iterations):
         # randomly select a point to test
         input = random.sample(data, 1)[0]
@@ -56,7 +56,7 @@ def complearn_clustering(data, num_outputs, iterations, learning_rate = 0.001):
         # else update the weights, reset stagnant counter
         else:
             weights[winner] = new_weights
-            stagnant = 5
+            stagnant = 50
 
     clusters = [[] for _ in range(num_outputs)]
 
@@ -98,6 +98,7 @@ def update_weights(weights, input, winner, learning_rate):
         data is normalized. new_weight = weight + learning_rate * feature for each weight. '''
 
     return [weight + learning_rate * (feature) for weight, feature in zip(weights[winner], input)]
+
 
 def get_min_max_values(data):
     ''' Create arrays of the maximum and minimum values for each feature of the points over the entire dataset'''

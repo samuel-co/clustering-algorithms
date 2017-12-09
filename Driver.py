@@ -102,17 +102,20 @@ def show_2d_clusters(data, clusters, normal=False):
         clusters = [CompLearn.normalize_data(cluster, mini, maxi) for cluster in clusters]
 
     colors = {0: 'k', 1: 'b', 2: 'g', 3: 'r', 4: 'c', 5: 'y', 6: 'm'}
-    color = 0
 
-    plt.grid(True)
+    #plt.scatter([point[0] for point in data], [point[1] for point in data], c='c', alpha=.2)
 
-    plt.scatter([point[0] for point in data], [point[1] for point in data], c='c', alpha=.2)
-
-    for cluster in clusters:
-        plt.scatter([point[0] for point in cluster], [point[1] for point in cluster], c=colors[color % 7])
-        color += 1
-
-    plt.show()
+    for i in range(len(data[0])-1):
+        for j in range(i+1, len(data[0])):
+            color = 0
+            plt.title("Plotting features {}, {}".format(i, j))
+            plt.xlabel("Feature {}".format(i))
+            plt.ylabel("Feature {}".format(j))
+            plt.grid(True)
+            for cluster in clusters:
+                plt.scatter([point[i] for point in cluster], [point[j] for point in cluster], c=colors[color % 7])
+                color += 1
+            plt.show()
 
 def main():
 
@@ -132,11 +135,16 @@ def main():
         point = []
         point.append(rand.uniform(0, .4))
         point.append(rand.uniform(0.6, 1))
-        mockData.append(point)
+        #mockData.append(point)
+
+        point = []
+        point.append(rand.uniform(.6, 1))
+        point.append(rand.uniform(0, 0.4))
+        #mockData.append(point)
+
 
     data, name = import_data('datasets/iris.txt')
-    data = mockData
-    name = 'mock'
+    #data, name = (mockData, 'mock')
 
     if False:
         print("Using K-Means to cluster dataset {}:".format(name))
@@ -145,17 +153,17 @@ def main():
         end = time.time()
         test_clustering(clusters, end-start)
 
-        show_2d_clusters(data, clusters, normal=True)
+        show_2d_clusters(data, clusters, normal=False)
 
-    if True:
+    if False:
         print("Using DBScan to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = DBScan.db_clustering(copy.deepcopy(data), 30, 0.2)
+        clusters = DBScan.db_clustering(copy.deepcopy(data), 30, 1.6)
         end = time.time()
         if clusters:
             test_clustering(clusters, end - start)
 
-        show_2d_clusters(data, clusters, normal=True)
+        show_2d_clusters(data, clusters, normal=False)
 
     if False:
         print("Using CompLearn to cluster dataset {}:".format(name))
