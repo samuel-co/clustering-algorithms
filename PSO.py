@@ -11,7 +11,6 @@ data, number of clusters to create, and maximum number of iterations to perform.
 state is achieved. Returns a list of clusters, each cluster represented as a list of the points contained.
 '''
 
-
 import random
 import copy
 import math
@@ -88,9 +87,7 @@ def pso_clustering(data, number_clusters, iterations=1000):
         list of clusters, each cluster represented as a list of the points contained.'''
 
     # initialize particles
-    particles = []
-    for _ in range(len(data)):
-        particles.append(Particle(len(data[0]), number_clusters))
+    particles = [Particle(len(data[0]), number_clusters) for _ in range(int(len(data) / 2))]
 
     # arbitrary initial fitness and position
     gb_fitness = 99999
