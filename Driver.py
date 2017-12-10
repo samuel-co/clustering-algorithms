@@ -41,6 +41,7 @@ def intra_distance(clusters):
     return total_sum / len(clusters)
 
 
+
 def inter_distance(clusters):
     ''' Calculate the average inter-cluster distance for each pair of clusters in clusters. Calculated as
            the average squared Euclidean distance between each point of each pair of clusters. Want to maximize. '''
@@ -146,17 +147,24 @@ def main():
         #mockData.append(point)
 
 
-    data, name = import_data('datasets/iris.txt')
+    data, name = import_data('datasets/iris.txt') # 3 clusters
+
+    data, name = import_data('datasets/car.txt')  # 4 clusters
+    data, name = import_data('datasets/cmc.txt')  # 3 clusters
+    data, name = import_data('datasets/yeast.txt')  # 5/6 to 10 clusters
+    data, name = import_data('datasets/seeds.txt') # 3 clusters
+    data, name = import_data('datasets/wholesale_customers data.txt') # ? clusters
     #data, name = (mockData, 'mock')
 
-    if False:
+
+    if True:
         print("Using K-Means to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = KMeans.kmeans_clustering(copy.deepcopy(data), 3, 10000)
+        clusters = KMeans.kmeans_clustering(copy.deepcopy(data), 4, 10000)
         end = time.time()
-        test_clustering(clusters, end-start)
+        test_clustering(clusters, end-start, normal=False)
 
-        show_2d_clusters(data, clusters, normal=False)
+        #show_2d_clusters(data, clusters, normal=False)
 
     if False:
         print("Using DBScan to cluster dataset {}:".format(name))
@@ -164,9 +172,9 @@ def main():
         clusters = DBScan.db_clustering(copy.deepcopy(data), 30, 1.6)
         end = time.time()
         if clusters:
-            test_clustering(clusters, end - start)
+            test_clustering(clusters, end - start, normal=False)
 
-        show_2d_clusters(data, clusters, normal=False)
+        #show_2d_clusters(data, clusters, normal=False)
 
     if False:
         print("Using CompLearn to cluster dataset {}:".format(name))
@@ -175,7 +183,7 @@ def main():
         end = time.time()
         test_clustering(clusters, end - start, normal=True)
 
-        show_2d_clusters(data, clusters, normal=True)
+        #show_2d_clusters(data, clusters, normal=True)
 
 
     if False:
@@ -185,16 +193,16 @@ def main():
         end = time.time()
         test_clustering(clusters, end - start, normal=False)
 
-        show_2d_clusters(data, clusters, normal=False)
+        #show_2d_clusters(data, clusters, normal=False)
 
     if False:
         print("Using ACO to cluster dataset {}:".format(name))
         start = time.time()
         clusters = ACO.aco_clustering(copy.deepcopy(data), 5, 1000)
         end = time.time()
-        test_clustering(clusters, end - start, normal=False)
+        test_clustering(clusters, end - start, normal=True)
 
-        show_2d_clusters(data, clusters, normal=False)
+        #show_2d_clusters(data, clusters, normal=False)
 
 
 

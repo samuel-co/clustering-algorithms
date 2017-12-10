@@ -32,7 +32,7 @@ class Ant:
         self.dimensions = dimensions
         self.item = None
         self.step_size = 2
-        self.search_radius = 2
+        self.search_radius = 3
 
     def decide_action(self, grid, terminate=False):
         ''' Manages an ants action each turn, i.e. chooses whether it will try to pick up an item, drop an
@@ -74,10 +74,10 @@ class Ant:
 
         pickup_probability = self.evaluate_fitness(grid, grid[tuple(self.position)])
         # if no other points are within our range, give ourselves a high chance of picking up the object
-        if pickup_probability is None: pickup_probability = 0.3
+        if pickup_probability == 0: pickup_probability = 0.1
 
         # higher the probability, the less the item fits there
-        if  pickup_probability ** 2 > random.random():
+        if  pickup_probability > random.random():
             #print("Picking up item")
             # if we manage to pick it up, update the ants item and return the new grid value
             self.item = copy.deepcopy(grid[tuple(self.position)])
@@ -92,10 +92,10 @@ class Ant:
 
         drop_probability = self.evaluate_fitness(grid, self.item)
         # if theres no other points within sight, give ourselves a very low chance of dropping the item
-        if drop_probability is None: drop_probability = 0.99
+        if drop_probability == 0: drop_probability = 0.99
 
         # higher the probability, the less the item fits there
-        if drop_probability ** 2 < random.random():
+        if drop_probability < random.random():
             # if we succeed at dropping, update the ant and return the item placed on the grid
             #print("Dropping item")
             item = copy.deepcopy(self.item)
@@ -135,9 +135,11 @@ class Ant:
 
         fitness = None
         # our fitness is the average distance to all located points
-        if len(distances) > 0: fitness = sum(distances) / len(distances)
-        #if len(distances) > 0: fitness = sum(distances) / ((2 * self.search_radius) ** 2 - 1)
-        #print("Final fitness = {}".format(fitness))
+        #if len(distances) > 0: fitness = sum(distances) / len(distances)
+
+        fitness = 0
+        if len(distances) > 0: fitness = sum(distances) / ((2 * self.search_radius) ** 2 - 1)
+        print("Final fitness = {}".format(fitness))
         return fitness
 
     def place(self, grid):
@@ -225,9 +227,9 @@ def aco_clustering(data, num_ants, iterations=1000):
                     else:
                         x2.append(key[0])
                         y2.append(key[1])
-
-            plt.scatter(x1, y1, c='b')
-            plt.scatter(x2, y2, c='r')
+            plt.title("Grid at iteration {}".format(i))
+            plt.scatter(x1, y1, c='b', s=[1 for _ in range(len(x1))], alpha=0.5)
+            plt.scatter(x2, y2, c='r', s=[1 for _ in range(len(x2))], alpha=0.5)
             plt.show()
 
 
@@ -275,11 +277,12 @@ if __name__ == "__main__":
         point.append(random.uniform(.6, 1))
         point.append(random.uniform(0, 0.4))
         # mockData.append(point)
+
     import Driver
-    data, name = Driver.import_data('datasets/iris.txt')
+    data, name = Driver.import_data('datasets/iris.txt') # 3 clusters
     data, name = (mockData, 'mock')
 
-    grid = aco_clustering(data, 50, 100000)
+    grid = aco_clustering(data, 40, 100000)
 
     x1 = []
     y1 = []
@@ -294,7 +297,8 @@ if __name__ == "__main__":
                 x2.append(key[0])
                 y2.append(key[1])
 
-    plt.scatter(x1, y1, c='b')
-    plt.scatter(x2, y2, c='r')
+    plt.title("Final grid")
+    plt.scatter(x1, y1, c='b', s=[1 for _ in range(len(x1))], alpha=0.5)
+    plt.scatter(x2, y2, c='r', s=[1 for _ in range(len(x2))], alpha=0.5)
     plt.show()
 
