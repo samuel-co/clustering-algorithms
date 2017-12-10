@@ -127,5 +127,12 @@ def pso_clustering(data, number_clusters, iterations=1000):
         # add the point to the closest cluster
         clusters[fitnesses.index(min(fitnesses))].append(point)
 
-    return clusters
+    # remove any empty clusters
+    new_cluster = []
+    for cluster in clusters:
+        if len(cluster) > 0:
+            new_cluster.append(cluster)
+
+
+    return new_cluster
 
