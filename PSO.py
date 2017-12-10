@@ -1,113 +1,134 @@
-import math
+'''
+Sam Congdon, Kendall Dilorenzo, Micheal Hewitt
+CSCI 447: MachineLearning
+Project 4: PSO
+December 11, 2017
+
+This python module is used to create a series of clusters using a PSO algorithm. The Particle class is
+used to track each particles information, such as its velocity and position history. The primary function
+is pso_clustering(), which handles the data and particle class to create the clusters. Parameters are the
+data, number of clusters to create, and maximum number of iterations to perform. Will terminate if a stable
+state is achieved. Returns a list of clusters, each cluster represented as a list of the points contained.
+'''
+
+
 import random
-import statistics
-class particle:
-    def __init__(self,location, fitness):
-        self.location=location
-        self.fitness=fitness
-        self.best=location
-        self.velocity=[]
-        self.cluster=[]
-        for i in location:
-            self.velocity.append(random.random())
-    def new_best(self,fitness):
-        self.best=self.location[:]
-        self.fitness=fitness
-    def new_location(self,lbest):
+import copy
+import math
+
+
+class Particle:
+    ''' The Particle class handle particle object, tracking each particles relevant information such as its
+        best positions and fitness and the current position and velocity. Methods are for initialization,
+        evaluating the particles fitness at its current position, updating the particle's velocity, and moving
+        the particle. '''
+
+    def __init__(self, dimensions, number_clusters):
+        ''' Intializes the info for a particle. Parameters are the dimensions of the data, and the number of
+            clusters that are to be created. '''
+
+        # create a position entry for each centroid, then  create a velocity vector of the same size.
+        self.position = [random.random() for _ in range(dimensions * number_clusters)]
+        self.velocity = [random.uniform(-1, 1) for _ in range(dimensions * number_clusters)]
+        self.best_position = copy.deepcopy(self.position)
+        # arbitrary initial fitness values
+        self.fitness = 0
+        self.best_fitness = 99999
+        self.dimensions = dimensions
+
+
+    def evaluate_fitness(self, data):
+        ''' Evaluate the fitness for this particle at its current position. Fitness is evaluated as the sum of
+            the Euclidean distances from each point to its nearest centroid. '''
+
+        self.fitness = 0
+        # evaluate every point
+        for point in data:
+            fitnesses = []
+            # calculate the difference from the point to each centroid we have in our position
+            for i in range(int(len(self.position) / self.dimensions)):
+                fitnesses.append(math.sqrt(sum([(a - b) ** 2 for a, b in zip(point, self.position[i*self.dimensions:(i+1) * self.dimensions])])))
+            # minimum distance to the fitness
+            self.fitness += min(fitnesses)
+
+        # if we've reached a new optimum for this particle, update the best memories
+        if self.fitness < self.best_fitness:
+            self.best_fitness = copy.deepcopy(self.fitness)
+            self.best_position = copy.deepcopy(self.position)
+
+
+    def update_velocity(self, gb_location):
+        ''' Calculates the new velocity for each point based on the current best global location,
+            the particles best recorded location, and the current velocity value. '''
+
+        # for every velocity value
         for i in range(len(self.velocity)):
-            self.velocity[i]=self.velocity[i]+1*random.random()*(lbest[i]-self.location[i])+1*random.random()*(self.best[i]-self.location[i])
-            while(math.fabs(self.velocity[i])>200):
-                self.velocity[i]=self.velocity[i]/2
+
+            # calculate and update with the new velocity value
+            self.velocity[i] = self.velocity[i] + random.random() * (self.best_position[i] - self.position[i]) + random.random() * (gb_location[i] - self.position[i])
+
+            # clamping method to keep the value below 100
+            while math.fabs(self.velocity[i]) > 100:
+                self.velocity[i] = self.velocity[i] / 2
+
+
+    def move(self):
+        ''' Moves the particle from its current position based on its current velocities. '''
+
+        # update each position value using its relevant velocity
         for i in range(len(self.velocity)):
-            self.location[i]=self.location[i]+self.velocity[i]
-        return self.location
+            self.position[i] += self.velocity[i]
 
-def PSOcluster (data, particle_num, iterations=100): #particle num = max clusters
-    clusters=[]
-    particles=[]
-    gbest=100
-    gb=[]
-    for i in range(particle_num):
-        #initialize particles as a random point in data, then add noise
-        temp=random.choice(data)
-        particles.append(particle(temp,100))
-        particles[-1].new_location(particles[0].location)
-        if(particles[-1].fitness<gbest):
-            gbest=particles[-1].fitness
-            gb=particles[-1].location[:]
-    for p in particles:
-        print(p.fitness)
-    for count in range(iterations):
-        #add points to clusters
-        make_clusters(particles,data)
-        for p in particles:
-            #check fitness of clusters (SSE)
-            fit, deletes=fitness(p,data)
-            for d in deletes:
-                data.remove(d)
-            if(fit<gbest):
-                #update best fit cluster
-                gbest=fit
-                gb=p.location[:]
-            if (fit<p.fitness):
-                p.new_best(fit)
-            p.new_location(gb)
-        print(count,gb,gbest,"\n")
-    for p in particles:
-        if len(p.cluster)>0:
-            clusters.append(p.cluster)
-        print(p.fitness)
-    return clusters
-# def fitness(part, data):
-#     '''average distance from centroid to points in cluster'''
-#     neighbor_distance = []
-#     # for each point in the data, check its distance from the passed in point.
-#     for candidate in part.cluster:
-#         # if the point is within range, add it to the list of neighbors
-#         distance=math.sqrt(sum([(a - b) ** 2 for a, b in zip(candidate[:-1], part.location[:-1])]))
-#         neighbor_distance.append(distance)
-#     if(len(neighbor_distance)==0):
-#         return 100
-#     return (sum(neighbor_distance)/len(neighbor_distance))
-def fitness(part,data, last=False):
-    if(len(part.cluster)==0):
-        part=particle(random.choice(data),100)
-        return 100,[]
-    elif(len(part.cluster)<len(data)/100):
-        part=particle(random.choice(data),100)
-        return 100,[]
-    cluster_sum = 0
-    feature_sums = []
-    total_sum=0
-    SSE_points=[]
-    for i in range(len(part.cluster[0])):
-        feature_sums += [sum([point[i] for point in part.cluster])]
-    mean_point = [feature_sum/len(part.cluster) for feature_sum in feature_sums]
 
-    # sum the SSE of each point in the cluster
-    for point in part.cluster:
-        point_SSE = math.sqrt(sum([(a - b) ** 2 for a, b in zip(point, mean_point)])) ** 2
-        total_sum += point_SSE
-        SSE_points.append(point_SSE)
+def pso_clustering(data, number_clusters, iterations=1000):
+    ''' Create a list of clusters through the PSO algorithm. Parameters are the data, number of clusters
+        to create, and maximum number of iterations to perform. Will terminate if a stable state is achieved.
+        Creates an equal number of particles as there are points in the data set. Continually iterates through
+        the list of particles, updating their positions and tracking the best position found yet. Returns a
+        list of clusters, each cluster represented as a list of the points contained.'''
 
-    std=statistics.stdev(SSE_points)
-    mean=statistics.mean(SSE_points)
-    print(len(SSE_points),len(part.cluster))
-    deletes=[]
-    for i in range(len(SSE_points)):
-        if SSE_points[i]>mean+(3*std):
-            deletes.append(part.cluster[i])
-    return (total_sum,deletes)
+    # initialize particles
+    particles = []
+    for _ in range(len(data)):
+        particles.append(Particle(len(data[0]), number_clusters))
 
-def make_clusters(particles,data):
-    '''add each data point to the cluster of the closest particle'''
-    for p in particles:
-        p.cluster.clear()
+    # arbitrary initial fitness and position
+    gb_fitness = 99999
+    gb_position = particles[0].position
+
+    # maximum number of stable iterations needed for early termination
+    stagnant = 500
+    for i in range(iterations):
+
+        # update each particle within the swarm
+        for particle in particles:
+            particle.evaluate_fitness(data)
+
+            # if we've found a better position, update our global bests
+            if particle.fitness < gb_fitness:
+                stagnant = 500
+                gb_fitness = copy.deepcopy(particle.fitness)
+                gb_position = copy.deepcopy(particle.position)
+
+            particle.move()
+            particle.update_velocity(gb_position)
+
+        # check the particles current stagnation value
+        stagnant -= 1
+        if stagnant <= 0:
+            print("PSO terminated early after {} iterations as stagnation was achieved".format(i))
+            break
+
+    # for each cluster to be returned, as specified by the parameter
+    clusters = [[] for _ in range(number_clusters)]
+    # place each point in a cluster
     for point in data:
-        d=1000
-        for p in particles:
-            distance=math.sqrt(sum([(a - b) ** 2 for a, b in zip(point, p.location)]))
-            if distance<d:
-                d=distance
-                temp=p
-        temp.cluster.append(point)
+        fitnesses = []
+        # calculate the difference from the point to each centroid we have in our position
+        for i in range(int(len(gb_position) / len(point))):
+            fitnesses.append(math.sqrt(sum([(a - b) ** 2 for a, b in zip(point, gb_position[i * len(point):(i + 1) * len(point)])])))
+        # add the point to the closest cluster
+        clusters[fitnesses.index(min(fitnesses))].append(point)
+
+    return clusters
+

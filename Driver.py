@@ -4,6 +4,7 @@ import math
 import KMeans
 import DBScan
 import CompLearn
+import PSO
 import time
 import copy
 import random as rand
@@ -53,6 +54,7 @@ def inter_distance(clusters):
                 for y in clusters[c2]:
                     inner_sum += [math.sqrt(sum([(a - b) ** 2 for a, b in zip(x, y)])) ** 2]
             total_sum += [sum(inner_sum) / len(inner_sum)]
+
     return sum(total_sum) / len(total_sum)
 
 def SSE(clusters):
@@ -103,7 +105,7 @@ def show_2d_clusters(data, clusters, normal=False):
 
     colors = {0: 'k', 1: 'b', 2: 'g', 3: 'r', 4: 'c', 5: 'y', 6: 'm'}
 
-    #plt.scatter([point[0] for point in data], [point[1] for point in data], c='c', alpha=.2)
+    plt.scatter([point[0] for point in data], [point[1] for point in data], c='c', alpha=.2)
 
     for i in range(len(data[0])-1):
         for j in range(i+1, len(data[0])):
@@ -173,6 +175,17 @@ def main():
         test_clustering(clusters, end - start, normal=True)
 
         show_2d_clusters(data, clusters, normal=True)
+
+
+    if True:
+        print("Using PSO to cluster dataset {}:".format(name))
+        start = time.time()
+        clusters = PSO.pso_clustering(copy.deepcopy(data), 2, 1000)
+        end = time.time()
+        test_clustering(clusters, end - start, normal=False)
+
+        show_2d_clusters(data, clusters, normal=False)
+
 
 
 if __name__ == '__main__':
