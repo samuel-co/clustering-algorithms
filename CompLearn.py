@@ -1,5 +1,5 @@
 '''
-Sam Congdon, Kendall Dilorenzo, Michel Hewitt
+Sam Congdon, Kendall Dilorenzo, Micheal Hewitt
 CSCI 447: MachineLearning
 Project 4: CompLearn
 December 11, 2017
