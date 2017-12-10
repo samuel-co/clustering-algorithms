@@ -5,6 +5,7 @@ import KMeans
 import DBScan
 import CompLearn
 import PSO
+import ACO
 import time
 import copy
 import random as rand
@@ -177,10 +178,19 @@ def main():
         show_2d_clusters(data, clusters, normal=True)
 
 
-    if True:
+    if False:
         print("Using PSO to cluster dataset {}:".format(name))
         start = time.time()
         clusters = PSO.pso_clustering(copy.deepcopy(data), 2, 1000)
+        end = time.time()
+        test_clustering(clusters, end - start, normal=False)
+
+        show_2d_clusters(data, clusters, normal=False)
+
+    if False:
+        print("Using ACO to cluster dataset {}:".format(name))
+        start = time.time()
+        clusters = ACO.aco_clustering(copy.deepcopy(data), 5, 1000)
         end = time.time()
         test_clustering(clusters, end - start, normal=False)
 
