@@ -98,11 +98,10 @@ def process_file(name_in, name_out, remove_column):
 # process each of the data files, remove the individual's class in classification problems
 process_file('datasets/iris.csv', 'datasets/iris.txt', [-1])
 
-process_file('datasets/abalone.csv', 'datasets/abalone.txt', [-1])
+process_file('datasets/wholesale_customers data.csv', 'datasets/wholesale_customers data.txt', [None])
+process_file('datasets/seeds.csv', 'datasets/seeds.txt', [-1])
 process_file('datasets/car.csv', 'datasets/car.txt', [-1])
 process_file('datasets/cmc.csv', 'datasets/cmc.txt', [-1])
-process_file('datasets/synthetic_control.tsv', 'datasets/synthetic_control.txt', [None])
 process_file('datasets/yeast.tsv', 'datasets/yeast.txt', [0, -1])
 
-# data has missing attributes
-# process_file('datasets/coil_1999_competition.csv', 'datasets/coil_1999_competition.txt', [], [None])
+
