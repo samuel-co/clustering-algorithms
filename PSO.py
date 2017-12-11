@@ -7,14 +7,13 @@ December 11, 2017
 This python module is used to create a series of clusters using a PSO algorithm. The Particle class is
 used to track each particles information, such as its velocity and position history. The primary function
 is pso_clustering(), which handles the data and particle class to create the clusters. Parameters are the
-data, number of clusters to create, and maximum number of iterations to perform. Will terminate if a stable
+data, max number of clusters to create, and maximum number of iterations to perform. Will terminate if a stable
 state is achieved. Returns a list of clusters, each cluster represented as a list of the points contained.
 '''
 
 import random
 import copy
 import math
-
 
 class Particle:
     ''' The Particle class handle particle object, tracking each particles relevant information such as its
@@ -80,21 +79,21 @@ class Particle:
 
 
 def pso_clustering(data, number_clusters, iterations=1000):
-    ''' Create a list of clusters through the PSO algorithm. Parameters are the data, number of clusters
+    ''' Create a list of clusters through the PSO algorithm. Parameters are the data, the maximum number of clusters
         to create, and maximum number of iterations to perform. Will terminate if a stable state is achieved.
         Creates an equal number of particles as there are points in the data set. Continually iterates through
         the list of particles, updating their positions and tracking the best position found yet. Returns a
         list of clusters, each cluster represented as a list of the points contained.'''
 
     # initialize particles
-    particles = [Particle(len(data[0]), number_clusters) for _ in range(int(len(data) / 2))]
+    particles = [Particle(len(data[0]), number_clusters) for _ in range(len(data[0]) ** 3)]
 
     # arbitrary initial fitness and position
     gb_fitness = 99999
     gb_position = particles[0].position
 
     # maximum number of stable iterations needed for early termination
-    stagnant = 1000
+    stagnant = 500
     for i in range(iterations):
 
         # update each particle within the swarm
@@ -103,7 +102,7 @@ def pso_clustering(data, number_clusters, iterations=1000):
 
             # if we've found a better position, update our global bests
             if particle.fitness < gb_fitness:
-                stagnant = 1000
+                stagnant = 500
                 gb_fitness = copy.deepcopy(particle.fitness)
                 gb_position = copy.deepcopy(particle.position)
 
@@ -132,7 +131,6 @@ def pso_clustering(data, number_clusters, iterations=1000):
     for cluster in clusters:
         if len(cluster) > 0:
             new_cluster.append(cluster)
-
 
     return new_cluster
 
