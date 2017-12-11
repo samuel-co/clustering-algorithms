@@ -12,8 +12,6 @@ to implement, and the maximum number of training iterations to complete. Returns
 cluster represented as a list of the points contained.
 '''
 
-#TODO: Finish the find_clusters() function to extract clusters from the 2D grid
-
 import random
 import math
 import copy
@@ -146,7 +144,10 @@ class Ant:
     def place(self, grid):
         ''' Force an ant to place its item once all training iterations have been completed. The ant gets to search
             through the entire space and place the item in the optimum point. Time consuming, its faster to use
-            terminate within decide actions, however the placement wont be optimal. '''
+            terminate within decide actions, however the placement wont be optimal.
+
+             NOTE: place() was not used during the experimental tests. '''
+
         # if the ant has no item, quit
         if self.item is None:
             return grid
@@ -171,7 +172,7 @@ class Ant:
         return grid
 
 
-def aco_clustering(data, num_ants, iterations=1000):
+def aco_clustering(data, num_ants, iterations=1000, show_plots=False):
     ''' Create a series of clusters through the ACO algorithm. Parameters are the data to be clustered, the
         number of ants to use, and the maximum number of training iterations to complete. Creates a 2D grid
         to randomly place the data points over, then creates the specified number of ants and randomly places
@@ -209,20 +210,20 @@ def aco_clustering(data, num_ants, iterations=1000):
         ants.append(Ant(dimensions))
 
     # train for the set number of iterations
-    for i in range(iterations):
+    for i in range(iterations+1):
         # each ant performs a task every training iteration
         for ant in ants:
             grid[tuple(ant.position)] = ant.decide_action(grid)
 
-        # prints out the current clustering state for the mock data
-        if False and i%(iterations / 10) == 0:
+        # prints out the current clustering state for the mock data, only works on the mock data
+        if show_plots and i%int(iterations / 10) == 0:
             x1 = []
             y1 = []
             x2 = []
             y2 = []
             for key, value in grid.items():
                 if value is not None:
-                    if sum(value) > 1:
+                    if value[0] > 0.5:
                         x1.append(key[0])
                         y1.append(key[1])
                     else:
@@ -233,7 +234,6 @@ def aco_clustering(data, num_ants, iterations=1000):
             plt.scatter(x2, y2, c='r', s=[1 for _ in range(len(x2))], alpha=0.5)
             plt.show()
 
-
     # force all the ants to drop their items, delete them once their not carrying anything
     radius = ants[0].search_radius
     while ants:
@@ -242,12 +242,13 @@ def aco_clustering(data, num_ants, iterations=1000):
                 grid[tuple(ant.position)] = ant.decide_action(grid, terminate=True)
                 if ant.item is None: ants.remove(ant)
 
-    clusters = find_clusters(grid, dimensions, radius)
+    clusters = find_clusters(grid, dimensions, radius, join_clusters=False)
     return clusters
 
-def find_clusters(grid, dimensions, search_radius):
+def find_clusters(grid, dimensions, search_radius, join_clusters=False):
     ''' This method uses an adjacency clustering technique to build clusters based on data point
-        locations over the grid manipulated by the ants. '''
+        locations over the grid manipulated by the ants. join_clusters can be set to True in order
+        to join the clusters made by the ants. NOT RECOMMENDED'''
 
     # create a 2D list specifying where points lie in the grid, points are specified with a 1, empty places with a 0
     graph = [[0 for _ in range(dimensions + 1)] for _ in range(dimensions + 1)]
@@ -271,6 +272,12 @@ def find_clusters(grid, dimensions, search_radius):
     # change the island values from coordinates to the actual points
     for i in range(len(islands)):
         islands[i] = [grid[tuple(position)] for position in islands[i]]
+
+    # if we don't want to join the ants cluster and just use their results, return now
+    if not join_clusters:
+        return islands
+
+    #----------------------The following code was not used during the experiments--------------------------------
 
     # now organize the islands by their respective sizes
     island_sizes = [len(island) for island in islands]
@@ -346,54 +353,4 @@ def DFS(graph, visited, position, dimensions, search_radius):
 
     return neighbors
 
-
-if __name__ == "__main__":
-
-    mockData = []
-    for i in range(10):
-        point = []
-        for j in range(2):
-            val = random.uniform(0, .4)
-            point.append(val)
-        mockData.append(point)
-        point = []
-        for j in range(2):
-            val = random.uniform(.6, 1)
-            point.append(val)
-        mockData.append(point)
-
-        point = []
-        point.append(random.uniform(0, .4))
-        point.append(random.uniform(0.6, 1))
-        # mockData.append(point)
-
-        point = []
-        point.append(random.uniform(.6, 1))
-        point.append(random.uniform(0, 0.4))
-        # mockData.append(point)
-
-    import Driver
-    data, name = Driver.import_data('datasets/iris.txt') # 3 clusters
-    data, name = (mockData, 'mock')
-
-    grid = aco_clustering(data, 4, 1000)
-
-
-    x1 = []
-    y1 = []
-    x2 = []
-    y2 = []
-    for key, value in grid.items():
-        if value is not None:
-            if sum(value) > 1:
-                x1.append(key[0])
-                y1.append(key[1])
-            else:
-                x2.append(key[0])
-                y2.append(key[1])
-
-    plt.title("Final grid")
-    plt.scatter(x1, y1, c='b', s=[1 for _ in range(len(x1))], alpha=0.5)
-    plt.scatter(x2, y2, c='r', s=[1 for _ in range(len(x2))], alpha=0.5)
-    plt.show()
 
