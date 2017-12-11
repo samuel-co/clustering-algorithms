@@ -94,7 +94,7 @@ def pso_clustering(data, number_clusters, iterations=1000):
     gb_position = particles[0].position
 
     # maximum number of stable iterations needed for early termination
-    stagnant = 500
+    stagnant = 1000
     for i in range(iterations):
 
         # update each particle within the swarm
@@ -103,7 +103,7 @@ def pso_clustering(data, number_clusters, iterations=1000):
 
             # if we've found a better position, update our global bests
             if particle.fitness < gb_fitness:
-                stagnant = 500
+                stagnant = 1000
                 gb_fitness = copy.deepcopy(particle.fitness)
                 gb_position = copy.deepcopy(particle.position)
 
