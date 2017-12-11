@@ -1,0 +1,13 @@
+
+
+The first four graphs show the resulting clusters produced by k-Means, DB-Scan, CompLearn, and PSO algorithms on a mock
+2 dimensional, 2 class dataset. The x and y axis represent each data point's values, while the color represents the cluster
+it belongs to. Up to six different colored clusters can be plotted.
+
+The final series of graphs demonstrate the execution of the ACO algorithm on the mock 2 dimensional, 2 class dataset.
+The x and y axis represent positions within the grid of the data points, while the color of the point represents which
+class it belongs to. Note that points will disappear from the grid when an ant is holding them, reappearing when its
+placed back onto the grid.
+
+The second program execution shows the algorithm executing on the iris dataset. It doesn't produce any charts, however the
+metric outputs are still displayed.

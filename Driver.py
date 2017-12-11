@@ -1,14 +1,29 @@
+'''
+Sam Congdon, Kendall Dilorenzo, Micheal Hewitt
+CSCI 447: MachineLearning
+Project 4: Driver
+December 11, 2017
 
-import os
-import math
+This python module is used to handle the execution of five clustering algorithms. Methods are used
+to import data from a file, evaluate the various metrics of clusters, graph clusters, and extract clusters
+from the algorithm. Currently is set to run the selected dataset across all the algorithms, printing the results.
+
+Algorithms implemented: k-means, db-scan, competitive learning, particle swarm optimization, and ant clustering
+optimization.
+
+Datasets usable: iris, car, cmc, seeds, yeast, wholesale_customer
+'''
+
 import KMeans
 import DBScan
 import CompLearn
 import PSO
 import ACO
+import os
+import math
 import time
 import copy
-import random as rand
+import random
 import matplotlib.pyplot as plt
 
 def import_data(file_name):
@@ -100,15 +115,21 @@ def test_clustering(clusters, time, normal = False, output=True):
     return eval
 
 def show_2d_clusters(data, clusters, normal=False):
+    ''' Display each possible 2D combination of the cluster features, output different clusters with
+        different clusters. Will normalize the data so outputs are always between 0 and 1. Primarily
+        used for testing algroithm on mock data. '''
 
+    # if the data isn't normalized, do so
     if not normal:
         mini, maxi = CompLearn.get_min_max_values(data)
         clusters = [CompLearn.normalize_data(cluster, mini, maxi) for cluster in clusters]
 
     colors = {0: 'k', 1: 'b', 2: 'g', 3: 'r', 4: 'c', 5: 'y', 6: 'm'}
 
-    plt.scatter([point[0] for point in data], [point[1] for point in data], c='c', alpha=.2)
+    # print the original, unclustered data
+    #plt.scatter([point[0] for point in data], [point[1] for point in data], c='c', alpha=.2)
 
+    # print each 2D combination of the features
     for i in range(len(data[0])-1):
         for j in range(i+1, len(data[0])):
             color = 0
@@ -123,94 +144,71 @@ def show_2d_clusters(data, clusters, normal=False):
 
 def main():
 
+    # creates 2D mock data for testing the clusters
     mockData = []
     for i in range(100):
-        point = []
-        for j in range(2):
-            val = rand.uniform(0, .4)
-            point.append(val)
-        mockData.append(point)
-        point = []
-        for j in range(2):
-            val = rand.uniform(.6, 1)
-            point.append(val)
-        mockData.append(point)
+        mockData.append([random.uniform(0, .4), random.uniform(0.6, 1)])
+        mockData.append([random.uniform(0.6, 1), random.uniform(0, 0.4)])
 
-        point = []
-        point.append(rand.uniform(0, .4))
-        point.append(rand.uniform(0.6, 1))
-        #mockData.append(point)
-
-        point = []
-        point.append(rand.uniform(.6, 1))
-        point.append(rand.uniform(0, 0.4))
-        #mockData.append(point)
-
-
-
-
-
-
-
-    data, name = import_data('datasets/wholesale_customers data.txt') # ? clusters
-    #data, name = (mockData, 'mock')
-    #data, name = import_data('datasets/iris.txt')  # 3 clusters
-    data, name = import_data('datasets/seeds.txt')  # 3 clusters
-
-    data, name = import_data('datasets/car.txt')  # 4 clusters
+    # select the data to use by uncommenting the relevant line
+    #data, name = import_data('datasets/car.txt')  # 4 clusters
     #data, name = import_data('datasets/cmc.txt')  # 3 clusters
+    #data, name = import_data('datasets/seeds.txt')  # 3 clusters
+    #data, name = import_data('datasets/wholesale_customers data.txt') # ? clusters
+    #data, name = import_data('datasets/yeast.txt')  # 5/6 to 10 clusters
+    #data, name = import_data('datasets/iris.txt')  # 3 clusters
+    data, name = (mockData, 'mock')
 
-    data, name = import_data('datasets/yeast.txt')  # 5/6 to 10 clusters
+    # select which algorithm to run by setting  their entry to True
+    algorithms = {"KMeans": True, "DBScan": True, "CompLearn": True, "PSO": True, "ACO": True}
 
-    if False:
+    # set display to True to output 2D scatter plots of clusters
+    display = True
+
+    if algorithms["KMeans"]:
         print("Using K-Means to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = KMeans.kmeans_clustering(copy.deepcopy(data), 3, 10000)
+        clusters = KMeans.kmeans_clustering(copy.deepcopy(data), 2, 10000)
         end = time.time()
         test_clustering(clusters, end-start, normal=False)
+        if display: show_2d_clusters(data, clusters, normal=False)
 
-        #show_2d_clusters(data, clusters, normal=False)
-
-    if False:
+    if algorithms["DBScan"]:
         print("Using DBScan to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = DBScan.db_clustering(copy.deepcopy(data), 20, 1.5)
+        clusters = DBScan.db_clustering(copy.deepcopy(data), 20, 0.3)
         end = time.time()
         if clusters:
             test_clustering(clusters, end - start, normal=False)
         else:
             print("No clusters returned.\nTime = {}".format(end - start))
 
-        #show_2d_clusters(data, clusters, normal=False)
+        if display: show_2d_clusters(data, clusters, normal=False)
 
-    if False:
+    if algorithms["CompLearn"]:
         print("Using CompLearn to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = CompLearn.complearn_clustering(copy.deepcopy(data), 6, 100000)
+        clusters = CompLearn.complearn_clustering(copy.deepcopy(data), 4, 100000)
         end = time.time()
         test_clustering(clusters, end - start, normal=True)
 
-        #show_2d_clusters(data, clusters, normal=True)
+        if display: show_2d_clusters(data, clusters, normal=True)
 
-    if True:
+    if algorithms["PSO"]:
         print("Using PSO to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = PSO.pso_clustering(copy.deepcopy(data), 6, 1000)
+        clusters = PSO.pso_clustering(copy.deepcopy(data), 2, 1000)
         end = time.time()
         test_clustering(clusters, end - start, normal=False)
 
-        #show_2d_clusters(data, clusters, normal=False)
+        if display: show_2d_clusters(data, clusters, normal=False)
 
-    if False:
+    if algorithms["ACO"]:
         print("Using ACO to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = ACO.aco_clustering(copy.deepcopy(data), 80, 1000000)
+        clusters = ACO.aco_clustering(copy.deepcopy(data), 40, 500000, display)
         end = time.time()
         test_clustering(clusters, end - start, normal=True)
-
-
-        #show_2d_clusters(data, clusters, normal=False)
-
 
 
 if __name__ == '__main__':
