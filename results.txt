@@ -1,0 +1,199 @@
+Using PSO to cluster dataset yeast:
+PSO terminated early after 502 iterations as stagnation was achieved
+- Number of clusters = 3
+- Intra-distance = 0.41815898595391626
+- Inter-distance = 1.007800884043797
+- SSE = 152.58660039200063
+- Time elapsed = 3527.02933192253113
+
+Using PSO to cluster dataset car:
+PSO terminated early after 587 iterations as stagnation was achieved
+- Number of clusters = 3
+- Intra-distance = 0.8895689050955432
+- Inter-distance = 2.078420961754268
+- SSE = 1571.3172429422427
+- Time elapsed = 5419.2754809856415
+
+Using PSO to cluster dataset cmc:
+PSO terminated early after 576 iterations as stagnation was achieved
+- Number of clusters = 2
+- Intra-distance = 1.2550753622008444
+- Inter-distance = 1.6686944228779763
+- SSE = 1235.2223855739508
+- Time elapsed = 7457.90282702445984
+
+Using DBScan to cluster dataset car:
+- Number of clusters = 1
+- Intra-distance = 1.8343949044410996
+- Inter-distance = 0
+- SSE = 1584.0000000000364
+- Time elapsed = 11.761032819747925
+
+Using ACO to cluster dataset car:
+- Number of clusters = 531
+- Intra-distance = 1.4438348261559153
+- Inter-distance = 1.7947561039227635
+- SSE = 702.7562981000497
+- Time elapsed = 2275.900243282318
+
+Using ACO to cluster dataset cmc:
+- Number of clusters = 460
+- Intra-distance = 1.6049052604293674
+- Inter-distance = 1.7180003423700203
+- SSE = 608.3200761877711
+- Time elapsed = 1885.5045001506805
+
+Using ACO to cluster dataset yeast:
+- Number of clusters = 471
+- Intra-distance = 0.18363198639760572
+- Inter-distance = 0.21963687651764455
+- SSE = 81.49017914306688
+- Time elapsed = 1927.9545638561249
+
+Using ACO to cluster dataset seeds:
+- Number of clusters = 35
+- Intra-distance = 0.5651896826112505
+- Inter-distance = 0.8018735478904663
+- SSE = 49.184470956586196
+- Time elapsed = 175.70138001441956
+
+Using ACO to cluster dataset wholesale_customers data:
+- Number of clusters = 82
+- Intra-distance = 0.8275743799754505
+- Inter-distance = 0.8867928040876756
+- SSE = 116.00466181651058
+- Time elapsed = 349.8382399082184
+
+Using K-Means to cluster dataset seeds:
+KMeans terminated after 10 iterations as stagnation was achieved
+- Number of clusters = 3
+- Intra-distance = 0.2173908132794533
+- Inter-distance = 1.1698015796000416
+- SSE = 22.69334067517397
+- Time elapsed = 0.0500030517578125
+
+Using DBScan to cluster dataset seeds:
+- Number of clusters = 3
+- Intra-distance = 0.15805435592763364
+- Inter-distance = 1.4742401664566265
+- SSE = 10.748335575431335
+- Time elapsed = 0.2550203800201416
+
+Using CompLearn to cluster dataset seeds:
+- Number of clusters = 3
+- Intra-distance = 0.3331088213137618
+- Inter-distance = 1.1837180405191414
+- SSE = 35.63974193515926
+- Time elapsed = 17.930031299591064
+
+Using PSO to cluster dataset seeds:
+PSO terminated early after 612 iterations as stagnation was achieved
+- Number of clusters = 1
+- Intra-distance = 0.8515399506135665
+- Inter-distance = 0
+- SSE = 88.98592483911848
+- Time elapsed = 286.2085256576538
+
+Using PSO to cluster dataset wholesale_customers data:
+PSO terminated early after 499 iterations as stagnation was achieved
+- Number of clusters = 2
+- Intra-distance = 0.42612068054074903
+- Inter-distance = 0.6767218367125477
+- SSE = 186.64085807684756
+- Time elapsed = 1025.0820457935333
+
+Using DBScan to cluster dataset yeast:
+- Number of clusters = 1
+- Intra-distance = 0.22038969033165387
+- Inter-distance = 0
+- SSE = 163.41895538092692
+- Time elapsed = 2239.782007217407
+
+Using K-Means to cluster dataset wholesale_customers data:
+KMeans terminated after 16 iterations as stagnation was achieved
+- Number of clusters = 4
+- Intra-distance = 0.8208076415357024
+- Inter-distance = 1.5928258959389021
+- SSE = 150.70432941584156
+- Time elapsed = 0.2798149585723877
+
+Using CompLearn to cluster dataset wholesale_customers data:
+- Number of clusters = 6
+- Intra-distance = 0.21295546506882754
+- Inter-distance = 0.862048226730811
+- SSE = 103.96879498421542
+- Time elapsed = 37.705743074417114
+
+Using DBScan to cluster dataset wholesale_customers data:
+- Number of clusters = 3
+- Intra-distance = 0.7811985168111096
+- Inter-distance = 1.1941253698752652
+- SSE = 42.518334754629855
+- Time elapsed = 1.4012579917907715
+
+Using K-Means to cluster dataset yeast:
+KMeans terminated after 12 iterations as stagnation was achieved
+- Number of clusters = 4
+- Intra-distance = 0.1486121760193903
+- Inter-distance = 0.29615339783938266
+- SSE = 103.87845947741476
+- Time elapsed = 0.5491209030151367
+
+Using CompLearn to cluster dataset yeast:
+- Number of clusters = 3
+- Intra-distance = 0.20615840742047264
+- Inter-distance = 1.4100928197151186
+- SSE = 137.3747977135347
+- Time elapsed = 29.763015031814575
+
+Using K-Means to cluster dataset cmc:
+KMeans terminated after 6 iterations as stagnation was achieved
+- Number of clusters = 3
+- Intra-distance = 1.5823885408617067
+- Inter-distance = 1.8182527993239253
+- SSE = 1134.497468483252
+- Time elapsed = 0.2480146884918213
+
+Using DBScan to cluster dataset cmc:
+- Number of clusters = 3
+- Intra-distance = 0.9607441312210715
+- Inter-distance = 1.4692285215651673
+- SSE = 53.250420747486395
+- Time elapsed = 10.90957522392273
+
+Using CompLearn to cluster dataset cmc:
+- Number of clusters = 3
+- Intra-distance = 1.2585281642180508
+- Inter-distance = 2.502636436814643
+- SSE = 904.7581206140458
+- Time elapsed = 18.90508532524109
+
+Using DBScan to cluster dataset cmc: 25, 1.5
+- Number of clusters = 3
+- Intra-distance = 0.9607441312210715
+- Inter-distance = 1.4692285215651673
+- SSE = 53.250420747486395
+- Time elapsed = 33.79160499572754
+
+Using K-Means to cluster dataset cmc:
+KMeans terminated after 8 iterations as stagnation was achieved
+- Number of clusters = 3
+- Intra-distance = 1.5810344332811368
+- Inter-distance = 1.8155901296609782
+- SSE = 1135.1171143047059
+- Time elapsed = 0.889028787612915
+
+Using K-Means to cluster dataset car:
+KMeans terminated after 7 iterations as stagnation was achieved
+- Number of clusters = 4
+- Intra-distance = 1.3924845412692914
+- Inter-distance = 1.9793336731671027
+- SSE = 1204.4964177978898
+- Time elapsed = 1.08803391456604
+
+Using CompLearn to cluster dataset car:
+- Number of clusters = 4
+- Intra-distance = 1.3212368439551585
+- Inter-distance = 2.0028880146574615
+- SSE = 1140.0969403097733
+- Time elapsed = 55.629743814468384
