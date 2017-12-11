@@ -133,13 +133,14 @@ class Ant:
                     #print(grid[(x, y)])
                     distances.append(math.sqrt(sum([(a - b) ** 2 for a, b in zip(grid[(x, y)], item)])))
 
-        fitness = None
+        #fitness = None
         # our fitness is the average distance to all located points
         #if len(distances) > 0: fitness = sum(distances) / len(distances)
 
+        # fitness is the sum euclidean's over the number of squares we searched, accounting for density
         fitness = 0
         if len(distances) > 0: fitness = sum(distances) / ((2 * self.search_radius) ** 2 - 1)
-        print("Final fitness = {}".format(fitness))
+        #print("Final fitness = {}".format(fitness))
         return fitness
 
     def place(self, grid):
@@ -184,7 +185,7 @@ def aco_clustering(data, num_ants, iterations=1000):
     data = CompLearn.normalize_data(data, mini, maxi)
 
     # calculate the dimensions of the grid from the size of the data
-    dimensions = int(math.sqrt(10 * len(data))) - 1
+    #dimensions = int(math.sqrt(10 * len(data))) - 1
     dimensions = len(data) - 1
 
     # create the initially empty grid
@@ -214,7 +215,7 @@ def aco_clustering(data, num_ants, iterations=1000):
             grid[tuple(ant.position)] = ant.decide_action(grid)
 
         # prints out the current clustering state for the mock data
-        if True and i%(iterations / 10) == 0:
+        if False and i%(iterations / 10) == 0:
             x1 = []
             y1 = []
             x2 = []
@@ -234,29 +235,122 @@ def aco_clustering(data, num_ants, iterations=1000):
 
 
     # force all the ants to drop their items, delete them once their not carrying anything
+    radius = ants[0].search_radius
     while ants:
         for ant in ants:
                 #grid = ant.place(grid)
                 grid[tuple(ant.position)] = ant.decide_action(grid, terminate=True)
                 if ant.item is None: ants.remove(ant)
 
-    clusters = find_clusters(grid)
-    return grid
+    clusters = find_clusters(grid, dimensions, radius)
+    return clusters
 
-def find_clusters(grid):
+def find_clusters(grid, dimensions, search_radius):
     ''' This method uses an adjacency clustering technique to build clusters based on data point
         locations over the grid manipulated by the ants. '''
 
+    # create a 2D list specifying where points lie in the grid, points are specified with a 1, empty places with a 0
+    graph = [[0 for _ in range(dimensions + 1)] for _ in range(dimensions + 1)]
     for key, value in grid.items():
+        key = list(key)
         if value is not None:
-            pass
-            #print(key)
+            graph[key[0]][key[1]] = 1
+
+    # create an array specifying which points have been visited in our graph, using False for not visited
+    visited = [[False for _ in range(dimensions + 1)] for _ in range(dimensions + 1)]
+
+    # check every point in the graph, if it hasn't already been checked and has a value, create an island from it
+    islands = []
+    for key, value in grid.items():
+        key = list(key)
+        if not visited[key[0]][key[1]]:
+            visited[key[0]][key[1]] = True
+            if graph[key[0]][key[1]] == 1:
+                islands.append(DFS(graph, visited, key, dimensions, search_radius) + [key])
+
+    # change the island values from coordinates to the actual points
+    for i in range(len(islands)):
+        islands[i] = [grid[tuple(position)] for position in islands[i]]
+
+    # now organize the islands by their respective sizes
+    island_sizes = [len(island) for island in islands]
+    biggest_cluster = max(island_sizes)
+    island_sizes = [[size, island] for size, island in zip(island_sizes, islands)]
+    island_sizes.sort()
+
+    # the largest island will always seed a cluster
+    clusters = [island_sizes[-1][1]]
+    island_sizes = island_sizes[:-1]
+    minnis = []
+
+    # if islands are too small we'll add them to other clusters, otherwise they can be a cluster
+    for island in reversed(island_sizes):
+        if island[0] < dimensions / len(islands):
+            minnis.append(island[1])
+        else:
+            clusters.append(island[1])
+
+    # if there were no tiny clusters, return now
+    if len(minnis) < 1:
+        return clusters
+
+    # calculate the mean point of each cluster
+    cluster_means = []
+    for cluster in clusters:
+        feature_sums = []
+        for i in range(len(cluster[0])):
+            feature_sums += [sum([point[i] for point in cluster])]
+        cluster_means.append([feature_sum / len(cluster) for feature_sum in feature_sums])
+
+    # calculate the mean point of each mini
+    mini_means = []
+    for mini in minnis:
+        feature_sums = []
+        for i in range(len(mini[0])):
+            feature_sums += [sum([point[i] for point in mini])]
+        mini_means.append([feature_sum / len(mini) for feature_sum in feature_sums])
+
+    # for each island that was too small to be a cluster
+    for i in range(len(minnis)):
+        smallest = 99999
+        id = -1
+        # find the cluster that has the closest mean
+        for j in range(len(cluster_means)):
+            dist = math.sqrt(sum([(a - b) ** 2 for a, b in zip(mini_means[i], cluster_means[j])]))
+            if  dist < smallest:
+                smallest = dist
+                id = j
+        # add this cluster to the closest found cluster
+        clusters[id] += minnis[i]
+
+    return clusters
+
+
+def DFS(graph, visited, position, dimensions, search_radius):
+    ''' Find all of the data points lieing within our search radius on the grid. Utilizes Depth First Search
+        to recursively find all the neighboring neighbors in order to create the island. Returns the completed
+        island. '''
+
+    # create an array of neighboring points to the passed in point
+    neighbors = []
+    # loop through all positions within our search radius
+    for x in range(position[0] - search_radius, position[0] + search_radius + 1):
+        for y in range(position[1] - search_radius, position[1] + search_radius + 1):
+            # if the position is valid and there's and it hasnt been visited, mark it as True
+            if x in range(dimensions+1) and y in range(dimensions+1) and [x, y] != position and visited[x][y] is not True:
+                visited[x][y] = True
+                # if the position has a point in it, add it and its neighbors to our neighbors
+                if graph[x][y] == 1:
+                    neighbors.append([x, y])
+                    neighbors += DFS(graph, visited, [x, y], dimensions, search_radius)
+
+    return neighbors
 
 
 if __name__ == "__main__":
 
     mockData = []
-    for i in range(100):
+    for i in range(10):
         point = []
         for j in range(2):
             val = random.uniform(0, .4)
@@ -282,7 +376,8 @@ if __name__ == "__main__":
     data, name = Driver.import_data('datasets/iris.txt') # 3 clusters
     data, name = (mockData, 'mock')
 
-    grid = aco_clustering(data, 40, 100000)
+    grid = aco_clustering(data, 4, 1000)
+
 
     x1 = []
     y1 = []

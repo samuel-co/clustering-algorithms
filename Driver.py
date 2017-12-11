@@ -147,17 +147,17 @@ def main():
         #mockData.append(point)
 
 
-    data, name = import_data('datasets/iris.txt') # 3 clusters
+
 
     data, name = import_data('datasets/car.txt')  # 4 clusters
     data, name = import_data('datasets/cmc.txt')  # 3 clusters
     data, name = import_data('datasets/yeast.txt')  # 5/6 to 10 clusters
-    data, name = import_data('datasets/seeds.txt') # 3 clusters
     data, name = import_data('datasets/wholesale_customers data.txt') # ? clusters
     #data, name = (mockData, 'mock')
+    data, name = import_data('datasets/iris.txt')  # 3 clusters
+    #data, name = import_data('datasets/seeds.txt')  # 3 clusters
 
-
-    if True:
+    if False:
         print("Using K-Means to cluster dataset {}:".format(name))
         start = time.time()
         clusters = KMeans.kmeans_clustering(copy.deepcopy(data), 4, 10000)
@@ -185,22 +185,22 @@ def main():
 
         #show_2d_clusters(data, clusters, normal=True)
 
-
     if False:
         print("Using PSO to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = PSO.pso_clustering(copy.deepcopy(data), 2, 1000)
+        clusters = PSO.pso_clustering(copy.deepcopy(data), 3, 1000)
         end = time.time()
         test_clustering(clusters, end - start, normal=False)
 
         #show_2d_clusters(data, clusters, normal=False)
 
-    if False:
+    if True:
         print("Using ACO to cluster dataset {}:".format(name))
         start = time.time()
-        clusters = ACO.aco_clustering(copy.deepcopy(data), 5, 1000)
+        clusters = ACO.aco_clustering(copy.deepcopy(data), 40, 100000)
         end = time.time()
         test_clustering(clusters, end - start, normal=True)
+
 
         #show_2d_clusters(data, clusters, normal=False)
 
